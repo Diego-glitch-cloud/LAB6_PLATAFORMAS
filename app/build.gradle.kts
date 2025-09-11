@@ -81,6 +81,8 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+
 
     // Debug y testing
     debugImplementation("androidx.compose.ui:ui-tooling")
