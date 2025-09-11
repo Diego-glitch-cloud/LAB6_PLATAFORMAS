@@ -7,12 +7,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.diegocal.laboratorio6.ui.theme.Laboratorio6Theme
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,29 +22,30 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Laboratorio6Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                NavHost(
+                    navController = navController,
+                    startDestination = "home"
+                ) {
+                    // Aquí definiremos las pantallas
+                    composable("home") {
+                        // Esta será la pantalla principal de la galería
+                        // PexelsScreen(navController = navController)
+                    }
+                    composable("profile") {
+                        // Pantalla de perfil
+                        // ProfileScreen()
+                    }
+                    composable(
+                        "details/{photoId}",
+                        arguments = listOf(navArgument("photoId") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val photoId = backStackEntry.arguments?.getInt("photoId")
+                        // Pantalla de detalles
+                        // DetailsScreen(photoId = photoId)
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Laboratorio6Theme {
-        Greeting("Android")
     }
 }
