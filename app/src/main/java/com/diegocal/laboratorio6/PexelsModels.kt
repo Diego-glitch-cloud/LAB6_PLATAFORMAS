@@ -11,7 +11,7 @@ data class Photo(
     val height: Int,
     val url: String,
     val photographer: String,
-    @Json(name = "src") val imageUrl: PhotoSrc
+    @Json(name = "src") val imageUrl: PhotoSrc // para traducir a moshi
 )
 
 // Resoluciones.
