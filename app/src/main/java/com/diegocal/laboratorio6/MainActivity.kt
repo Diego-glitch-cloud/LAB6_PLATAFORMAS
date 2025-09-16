@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.diegocal.laboratorio6.ui.theme.Laboratorio6Theme
+import com.diegocal.laboratorio6.ui.theme.ThemeState
 import com.diegocal.laboratorio6.ui.theme.rememberThemeState
 import com.diegocal.laboratorio6.ui.views.DetailsScreen
 import com.diegocal.laboratorio6.ui.views.PexelsScreen
@@ -19,7 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val themeState = rememberThemeState()
-            Laboratorio6Theme(isDarkTheme = themeState.isDark) {
+            Laboratorio6Theme(isDarkTheme = themeState.isDark.value) {
                 val navController = rememberNavController()
 
                 NavHost(navController = navController, startDestination = "home") {
