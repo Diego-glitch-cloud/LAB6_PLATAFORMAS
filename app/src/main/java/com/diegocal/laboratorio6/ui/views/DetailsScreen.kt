@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.diegocal.laboratorio6.Photo
 import com.diegocal.laboratorio6.RetrofitPexels
@@ -24,19 +25,24 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreen(
+    navController: NavController,
     photoId: Int
 ) {
     var photo by remember { mutableStateOf<Photo?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(photoId) {
         isLoading = true
-        // Esto es solo un placeholder, la API de Pexels no tiene un endpoint para esto.
-        // Para el laboratorio, podrías buscar la foto en la lista de la pantalla principal.
-        // Por ahora, para que compile y funcione la navegación,
-        // dejaremos un mensaje simple.
-        isLoading = false
+        errorMessage = null
+        try {
+            val photoResult = RetrofitPexels.retrofitService.getPhotoById(photoId)
+            photo = photoResult
+        } catch (e: Exception) {
+            errorMessage = "Error al cargar la foto: ${e.message}"
+        } finally {
+            isLoading = false
+        }
     }
 
     Scaffold(
@@ -48,8 +54,12 @@ fun DetailsScreen(
                     )
                 },
                 navigationIcon = {
-                    // El botón de volver está en MainActivity.kt con navController.
-                    // Para este composable, no necesitamos el navController.
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Volver"
+                        )
+                    }
                 }
             )
         }
@@ -60,10 +70,18 @@ fun DetailsScreen(
                 .padding(padding),
             contentAlignment = Alignment.Center
         ) {
-            if (isLoading) {
-                CircularProgressIndicator()
-            } else {
-                photo?.let { p ->
+            when {
+                isLoading -> {
+                    CircularProgressIndicator()
+                }
+                errorMessage != null -> {
+                    Text(
+                        text = errorMessage ?: "Error desconocido",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+                photo != null -> {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -73,8 +91,8 @@ fun DetailsScreen(
                     ) {
                         // Muestra la imagen de la foto
                         AsyncImage(
-                            model = p.imageUrl.large,
-                            contentDescription = p.photographer,
+                            model = photo!!.imageUrl.large,
+                            contentDescription = photo!!.photographer,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(300.dp),
@@ -83,21 +101,26 @@ fun DetailsScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         // Muestra el nombre del fotógrafo
                         Text(
-                            text = "Fotógrafo: ${p.photographer}",
+                            text = "Fotógrafo: ${photo!!.photographer}",
                             style = MaterialTheme.typography.titleMedium
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        // Muestra el tamaño de la foto (o likes, si tuvieras la info)
+                        // Muestra el tamaño de la foto
                         Text(
-                            text = "Tamaño: ${p.width} x ${p.height}",
+                            text = "Tamaño: ${photo!!.width} x ${photo!!.height}",
                             style = MaterialTheme.typography.bodyMedium
                         )
-                        // Botón opcional de compartir (sin funcionalidad por ahora)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { /* TODO: Implementar share intent */ }) {
-                            Text("Compartir")
-                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        // URL de la foto
+                        Text(
+                            text = "ID: ${photo!!.id}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
+                }
+                else -> {
+                    Text("No se pudo cargar la foto")
                 }
             }
         }

@@ -143,8 +143,7 @@ fun PexelsScreen(
                                 photo = photo,
                                 onClick = {
                                     navController.navigate("details/${photo.id}")
-                                }
-                            )
+                                }                            )
                         }
                         // Indicador de carga al final de la lista
                         if (isLoading && hasNextPage) {
